@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Party Battle</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(140deg,#151138,#5422a3,#d22c89);color:white;text-align:center;min-height:100vh;padding:25px 15px}
+main{max-width:500px;margin:auto}
+h1{font-size:42px;margin:20px 0 5px}
+p{line-height:1.6}
+.card{background:#ffffff19;border:1px solid #ffffff45;border-radius:22px;padding:25px 18px;margin:25px 0;box-shadow:0 12px 30px #0003}
+input{width:100%;padding:16px;border:0;border-radius:12px;font-size:17px}
+button{background:#ffdf43;border:0;border-radius:14px;padding:15px 20px;font-size:17px;font-weight:bold;cursor:pointer;margin:7px;color:#281250}
+button:active{transform:scale(.97)}
+.secondary{background:#eee;color:#281250}
+.hidden{display:none}
+#challenge{font-size:23px;font-weight:bold;min-height:115px;display:grid;place-items:center}
+#scores{line-height:2;text-align:left;max-width:300px;margin:auto}
+small{opacity:.85}
+</style>
+</head>
+<body>
+<main>
+<h1>🎉 PARTY BATTLE</h1>
+<p>Daag je vrienden uit. Verzamel punten. Word de kampioen!</p>
+
+<section id="setup" class="card">
+<h2>🎮 Start het spel</h2>
+<p>Vul minstens 2 spelers in, gescheiden door een komma.</p>
+<input id="names" placeholder="Emma, Noah, Lisa">
+<button onclick="start()">START BATTLE 🚀</button>
+</section>
+
+<section id="game" class="hidden">
+<div class="card">
+<p id="round"></p>
+<h2 id="player"></h2>
+<small>JOUW UITDAGING</small>
+<div id="challenge"></div>
+<button onclick="next(true)">✅ Gelukt! +1 punt</button>
+<button class="secondary" onclick="next(false)">❌ Niet gelukt</button>
+</div>
+<div class="card">
+<h2>🏆 Scorebord</h2>
+<div id="scores"></div>
+</div>
+</section>
+
+<section id="end" class="card hidden">
+<h2>🏆 GAME OVER!</h2>
+<h2 id="winner"></h2>
+<div id="finalScores"></div>
+<button onclick="location.reload()">🔄 Opnieuw spelen</button>
+</section>
+</main>
+<script>
+let players=[],turn=0;
+const rounds=5;
+const tasks=[
+"💃 Dans 20 seconden zonder muziek!",
+"😂 Laat iedereen lachen binnen 30 seconden!",
+"🎤 Zing een bekend liedje!",
+"🤪 Trek 5 gekke gezichten!",
+"🧠 Noem 5 landen binnen 15 seconden!",
+"🎭 Doe een beroemd persoon na!",
+"🔥 Doe 10 squats!",
+"🐶 Doe een dier na. Laat anderen raden!",
+"🎬 Speel een filmscène na!",
+"⚡ Noem 5 dieren binnen 10 seconden!",
+"🎶 Neurie een lied. Laat iemand raden!",
+"😆 Vertel de grappigste mop die je kent!",
+"🏆 Geef jezelf een overwinningsspeech!",
+"🕺 Doe een gekke overwinningsdans!",
+"🎨 Teken een kat met je ogen dicht!",
+"👀 Probeer 20 seconden niet te lachen!",
+"🤖 Praat 30 seconden als een robot!",
+"🗣️ Zeg 3 keer snel: de kat krabt de krullen!",
+"🎯 Noem 5 dingen die rood zijn!",
+"💥 Sta 15 seconden op één been!"
+];
+let remaining=[];
+function $(id){return document.getElementById(id)}
+function start(){
+let names=$("names").value.split(",").map(x=>x.trim()).filter(Boolean);
+if(names.length<2){alert("Vul minstens 2 spelers in!");return}
+if(names.length>10){alert("Maximaal 10 spelers!");return}
+players=names.map(name=>({name,score:0}));
+$("setup").classList.add("hidden");
+$("game").classList.remove("hidden");
+show();
+}
+function show(){
+let p=players[turn%players.length];
+$("round").textContent="RONDE "+(Math.floor(turn/players.length)+1)+" VAN "+rounds;
+$("player").textContent="🔥 "+p.name+" is aan de beurt!";
+if(!remaining.length)remaining=[...tasks];
+let i=Math.floor(Math.random()*remaining.length);
+$("challenge").textContent=remaining.splice(i,1)[0];
+$("scores").innerHTML="";
+players.forEach(x=>{
+let line=document.createElement("div");
+line.textContent="⭐ "+x.name+": "+x.score+" punten";
+$("scores").appendChild(line);
+});
+}
+function next(success){
+if(success)players[turn%players.length].score++;
+turn++;
+if(turn>=players.length*rounds){
+finish();
+}else{show()}
+}
+function finish(){
+$("game").classList.add("hidden");
+$("end").classList.remove("hidden");
+let high=Math.max(...players.map(x=>x.score));
+let winners=players.filter(x=>x.score===high).map(x=>x.name);
+$("winner").textContent=winners.join(" & ")+" wint! 🎉";
+$("finalScores").textContent=players.map(x=>x.name+": "+x.score+" punten").join(" | ");
+}
+</script>
+</body>
+</html>
